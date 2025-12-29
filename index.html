@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JET OS | المنظومة الشاملة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Tajawal:wght@400;500;700;900&family=Orbitron:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-body: #050505;
+            --bg-nav: rgba(5, 5, 5, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 204, 0, 0.15);
+            --jet-gold: #FFCC00;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f1f5f9;
+            --bg-nav: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color 0.4s ease;
+        }
+
+        .font-tech { font-family: 'Orbitron', sans-serif; }
+
+        .page-content { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease-out; }
+        .page-content.active { display: block; opacity: 1; transform: translateY(0); }
+
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card:hover {
+            border-color: var(--jet-gold);
+            transform: translateY(-4px);
+        }
+
+        .nav-btn { font-size: 10px; font-weight: 800; color: #888; transition: all 0.3s; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid transparent; padding-bottom: 2px; }
+        .nav-btn.active { color: #FFCC00; border-color: #FFCC00; }
+
+        .service-group-title {
+            position: relative;
+            padding-right: 1.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 3rem;
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+        .service-group-title::before {
+            content: '';
+            position: absolute;
+            right: 0; top: 15%; bottom: 15%;
+            width: 4px; background: var(--jet-gold);
+            border-radius: 4px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 8px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-wa { background: #25d366; color: white; }
+        .btn-save { background: rgba(255, 204, 0, 0.1); color: var(--jet-gold); border: 1px solid rgba(255, 204, 0, 0.1); }
+
+        .price-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .delivery-tag {
+            font-size: 9px;
+            color: var(--jet-gold);
+            font-weight: 700;
+        }
+
+        @media (max-width: 640px) {
+            .hero-title { font-size: 3.5rem !important; }
+            .nav-btn { font-size: 9px; }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-[#FFCC00] selection:text-black">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-[100] backdrop-blur-md border-b border-white/5" style="background-color: var(--bg-nav);">
+        <div class="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="showPage('home')">
+                <div class="w-10 h-10 bg-[#FFCC00] rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-bolt text-black text-lg"></i>
+                </div>
+                <span class="text-xl font-black font-tech tracking-tighter uppercase">JET <span class="text-[#FFCC00]">OS</span></span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-6 bg-black/20 px-6 py-2 rounded-full border border-white/5">
+                <button onclick="showPage('home')" class="nav-btn active" data-nav="home">الرئيسية</button>
+                <button onclick="showPage('market')" class="nav-btn" data-nav="market">جيت ماركت</button>
+                <button onclick="showPage('services')" class="nav-btn" data-nav="services">الخدمات</button>
+                <button onclick="showPage('wallet')" class="nav-btn" data-nav="wallet">المحفظة</button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full flex items-center justify-center bg-white/5 text-[#FFCC00] border border-white/10">
+                    <i id="theme-icon" class="fas fa-moon text-sm"></i>
+                </button>
+                <button onclick="showPage('wallet')" class="px-4 py-2 rounded-xl bg-[#FFCC00] text-black font-black text-[9px] uppercase shadow-md">
+                    <i class="fas fa-wallet"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-20 pb-10">
+
+        <!-- 1. HOME -->
+        <section id="home" class="page-content active">
+            <div class="max-w-7xl mx-auto px-6 text-center mt-12 sm:mt-20">
+                <div class="inline-block px-3 py-1 rounded-full bg-[#FFCC00]/10 border border-[#FFCC00]/20 text-[#FFCC00] text-[9px] font-black uppercase tracking-widest mb-4">Beni Mellal Smart City</div>
+                <h1 class="hero-title text-5xl sm:text-7xl lg:text-9xl font-black font-tech mb-6 leading-none uppercase">
+                    JET <span class="text-[#FFCC00]">EVO</span>
+                </h1>
+                <p class="text-base sm:text-xl max-w-2xl mx-auto mb-10 opacity-70 leading-relaxed">
+                    نظام تشغيل الخدمات والأسواق في بني ملال. الأول من نوعه المبني على ميزانية المواطن.
+                </p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="showPage('market')" class="bg-[#FFCC00] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-transform">دخول الماركت</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. JET MARKET (Price-Focused) -->
+        <section id="market" class="page-content">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <!-- Smart Search -->
+                <div class="mb-10 mt-6">
+                    <div class="glass-card p-2 flex items-center gap-3">
+                        <i class="fas fa-search text-[#FFCC00] ml-3 mr-2"></i>
+                        <input type="text" placeholder="بحث ذكي بالأثمنة (مثلاً: غداء بـ 20 درهم)" class="bg-transparent border-none outline-none w-full text-xs font-bold py-2">
+                    </div>
+                </div>
+
+                <!-- Section: Deals & Steals -->
+                <div class="mb-12">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-black uppercase border-r-4 border-[#FFCC00] pr-3">أفضل قيمة (Deals)</h3>
+                    </div>
+                    <div id="market-deals" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Dynamic Content -->
+                    </div>
+                </div>
+
+                <!-- Section: Budget Categories -->
+                <div id="market-sections">
+                    <!-- Loaded via JS: Economy ($), Mid ($$), Premium ($$$) -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SERVICES -->
+        <section id="services" class="page-content">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div id="services-container"></div>
+            </div>
+        </section>
+
+        <!-- 4. WALLET -->
+        <section id="wallet" class="page-content">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6">
+                <div class="glass-card p-8 text-center mb-6">
+                    <h2 class="text-2xl font-black font-tech mb-2">المحفظة الذكية</h2>
+                    <p class="text-[9px] opacity-40 mb-4" id="user-id-display">...</p>
+                    <div class="flex justify-center gap-4">
+                         <div class="text-center">
+                             <p class="text-[10px] font-bold opacity-50 uppercase">Balance</p>
+                             <p class="text-xl font-black text-[#FFCC00]">0.00 <span class="text-[10px]">DH</span></p>
+                         </div>
+                    </div>
+                </div>
+                <div id="ideas-list" class="space-y-3">
+                    <div class="text-center py-10 opacity-30 text-[10px] uppercase font-black tracking-widest">No Saved Ideas Yet</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-[#FFCC00] text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-2xl opacity-0 pointer-events-none transition-all z-[300]">
+        Notification
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'jet-os-v1';
+        let currentUser = null;
+
+        // Market Content
+        const marketData = {
+            deals: [
+                { name: "سناك علي", tag: "أرخص وجبة", price: "15 DH", delivery: "FAPOUR", icon: "fas fa-hamburger" },
+                { name: "محلبة السلام", tag: "توصيل 0 DH", price: "12 DH", delivery: "FREE", icon: "fas fa-blender" },
+                { name: "سندوتش تيكواي", tag: "الأكثر طلباً", price: "18 DH", delivery: "5 DH", icon: "fas fa-bread-slice" },
+                { name: "كافيه جيت", tag: "فطور اقتصادي", price: "20 DH", delivery: "FREE", icon: "fas fa-coffee" }
+            ],
+            categories: [
+                {
+                    title: "الفئة الاقتصادية ($)",
+                    items: [
+                        { name: "سناك النصر", avg: "غداء بـ 20 درهم", delivery: "5 DH", badge: "أفضل قيمة", desc: "سندوتشات كفتة ودجاج متنوعة" },
+                        { name: "محلبة الخير", avg: "فطور بـ 12 درهم", delivery: "3 DH", badge: "شعبية", desc: "عصائر طبيعية ومسمن" }
+                    ]
+                },
+                {
+                    title: "الفئة المتوسطة ($$)",
+                    items: [
+                        { name: "بيتزا روما", avg: "وجبة بـ 45 درهم", delivery: "10 DH", badge: "VIP", desc: "بيتزا إيطالية مخبوزة على الحطب" },
+                        { name: "طاجين بلادي", avg: "غداء بـ 55 درهم", delivery: "8 DH", badge: "صحي", desc: "طواجن مغربية أصيلة" }
+                    ]
+                },
+                {
+                    title: "الفئة الممتازة ($$$)",
+                    items: [
+                        { name: "مطعم البرج", avg: "عشاء بـ 120 درهم", delivery: "15 DH", badge: "Premium", desc: "أطباق عالمية وخدمة فاخرة" }
+                    ]
+                }
+            ]
+        };
+
+        const serviceData = [
+            {
+                group: "🏠 خدمات البيت",
+                items: [
+                    { name: "توصيل المؤونة", icon: "shopping-cart", desc: "لحوم، خضر، وفواكه من السوق." },
+                    { name: "غاز وبوطة", icon: "fire", desc: "تبديل البوطة في أقل من 20 دقيقة." }
+                ]
+            }
+        ];
+
+        // Functions
+        window.showPage = (id) => {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            setTimeout(() => {
+                document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+                const target = document.getElementById(id);
+                target.style.display = 'block';
+                setTimeout(() => target.classList.add('active'), 20);
+            }, 300);
+            document.querySelectorAll('[data-nav]').forEach(n => n.classList.toggle('active', n.dataset.nav === id));
+        };
+
+        window.toggleTheme = () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const target = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', target);
+            document.getElementById('theme-icon').className = target === 'light' ? 'fas fa-sun text-sm' : 'fas fa-moon text-sm';
+        };
+
+        function renderMarket() {
+            const deals = document.getElementById('market-deals');
+            deals.innerHTML = marketData.deals.map(d => `
+                <div class="glass-card p-4 flex flex-col justify-between h-full border-dashed border-[#FFCC00]/30">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="bg-[#FFCC00] text-black text-[7px] font-black px-2 py-0.5 rounded">${d.tag}</span>
+                        <i class="${d.icon} text-[#FFCC00] text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[11px] font-black">${d.name}</h4>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs font-black text-[#10b981]">${d.price}</span>
+                            <span class="delivery-tag text-[8px] uppercase">${d.delivery}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const sections = document.getElementById('market-sections');
+            sections.innerHTML = marketData.categories.map(cat => `
+                <div class="mb-10">
+                    <h3 class="service-group-title text-sm uppercase">${cat.title}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${cat.items.map(item => `
+                            <div class="glass-card p-5 flex items-center justify-between group">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-[#FFCC00]">
+                                        <i class="fas fa-store"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="text-xs font-black">${item.name}</h4>
+                                            <span class="text-[8px] px-2 py-0.5 rounded bg-[#FFCC00]/10 text-[#FFCC00] font-bold">${item.badge}</span>
+                                        </div>
+                                        <p class="text-[9px] opacity-40 mt-1">${item.desc}</p>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <span class="text-[10px] font-black text-[#10b981]">${item.avg}</span>
+                                            <span class="text-[9px] font-bold opacity-60"><i class="fas fa-motorcycle mr-1"></i> ${item.delivery}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onclick="saveIdea('Request: ${item.name}')" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#FFCC00] hover:text-black transition-colors">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderServices() {
+            const container = document.getElementById('services-container');
+            container.innerHTML = serviceData.map(group => `
+                <div>
+                    <h3 class="service-group-title uppercase">${group.group}</h3>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${group.items.map(item => `
+                            <div class="glass-card p-5 text-center">
+                                <div class="w-12 h-12 bg-[#FFCC00]/10 text-[#FFCC00] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-${item.icon} text-lg"></i>
+                                </div>
+                                <h4 class="text-xs font-black mb-1">${item.name}</h4>
+                                <p class="text-[9px] opacity-40 mb-4">${item.desc}</p>
+                                <button onclick="saveIdea('Service: ${item.name}')" class="action-btn btn-save w-full">حفظ في القائمة</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.saveIdea = async (text) => {
+            if (!currentUser) return showToast("Authenticating...");
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'ideas'), {
+                    text,
+                    timestamp: serverTimestamp()
+                });
+                showToast(`تم الحفظ: ${text}`);
+            } catch (e) { console.error(e); }
+        };
+
+        function showToast(m) {
+            const t = document.getElementById('toast');
+            t.innerText = m; t.style.opacity = '1';
+            setTimeout(() => t.style.opacity = '0', 2500);
+        }
+
+        // Firebase Auth & Data
+        onAuthStateChanged(auth, u => {
+            if (u) {
+                currentUser = u;
+                document.getElementById('user-id-display').innerText = `ID: ${u.uid}`;
+                
+                // Real-time listener for ideas
+                const q = query(collection(db, 'artifacts', appId, 'users', u.uid, 'ideas'), orderBy('timestamp', 'desc'));
+                onSnapshot(q, snapshot => {
+                    const list = document.getElementById('ideas-list');
+                    if(snapshot.empty) return;
+                    list.innerHTML = snapshot.docs.map(doc => `
+                        <div class="glass-card p-4 flex justify-between items-center">
+                            <span class="text-xs font-bold">${doc.data().text}</span>
+                            <span class="text-[8px] opacity-30">${new Date(doc.data().timestamp?.toDate()).toLocaleDateString()}</span>
+                        </div>
+                    `).join('');
+                }, err => console.log(err));
+            }
+        });
+
+        // Initialize
+        window.onload = async () => {
+            renderMarket();
+            renderServices();
+            await signInAnonymously(auth);
+        };
+    </script>
+</body>
+</html>
