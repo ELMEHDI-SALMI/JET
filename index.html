@@ -3,411 +3,474 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JET OS | المنظومة الشاملة</title>
+    <title>JET OS | Phase 2: Advanced Services Catalog</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Tajawal:wght@400;500;700;900&family=Orbitron:wght@400;700;900&display=swap');
-
-        :root {
-            --bg-body: #050505;
-            --bg-nav: rgba(5, 5, 5, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.03);
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap');
+        
+        :root { 
+            --bg-body: #050505; 
             --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --border-color: rgba(255, 204, 0, 0.15);
-            --jet-gold: #FFCC00;
+            --bg-nav: rgba(5, 5, 5, 0.9); 
+            --jet-gold: #FFCC00; 
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 204, 0, 0.1); 
         }
 
-        [data-theme="light"] {
-            --bg-body: #f1f5f9;
-            --bg-nav: rgba(255, 255, 255, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.8);
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --border-color: rgba(0, 0, 0, 0.05);
+        body.light-mode {
+            --bg-body: #f8f9fa;
+            --text-main: #1a1a1a;
+            --bg-nav: rgba(248, 249, 250, 0.9);
+            --glass-bg: rgba(0, 0, 0, 0.03);
+            --border-color: rgba(0, 0, 0, 0.1);
         }
 
-        body {
-            font-family: 'Cairo', 'Tajawal', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            overflow-x: hidden;
-            transition: background-color 0.4s ease;
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-
+        
         .font-tech { font-family: 'Orbitron', sans-serif; }
 
-        .page-content { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease-out; }
-        .page-content.active { display: block; opacity: 1; transform: translateY(0); }
+        .page-content { 
+            display: none; 
+            opacity: 0; 
+            transform: translateY(15px); 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .page-content.active { 
+            display: block; 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+
+        .nav-btn { 
+            font-size: 11px; 
+            font-weight: 800; 
+            color: #666; 
+            text-transform: uppercase; 
+            transition: 0.3s;
+        }
+        .nav-btn.active { color: var(--jet-gold); }
 
         .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
+            background: var(--glass-bg);
             border: 1px solid var(--border-color);
-            border-radius: 1.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
-
         .glass-card:hover {
             border-color: var(--jet-gold);
-            transform: translateY(-4px);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.05);
         }
 
-        .nav-btn { font-size: 10px; font-weight: 800; color: #888; transition: all 0.3s; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid transparent; padding-bottom: 2px; }
-        .nav-btn.active { color: #FFCC00; border-color: #FFCC00; }
-
-        .service-group-title {
-            position: relative;
-            padding-right: 1.5rem;
-            margin-bottom: 1.5rem;
-            margin-top: 3rem;
-            font-size: 1.25rem;
-            font-weight: 900;
-        }
-        .service-group-title::before {
-            content: '';
-            position: absolute;
-            right: 0; top: 15%; bottom: 15%;
-            width: 4px; background: var(--jet-gold);
-            border-radius: 4px;
+        .sticky-filters {
+            position: sticky;
+            top: 80px;
+            z-index: 50;
+            background: var(--bg-body);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .action-btn {
-            display: flex;
+        .filter-chip {
+            padding: 8px 18px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: bold;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+        .filter-chip.active {
+            background: var(--jet-gold);
+            color: #000;
+            border-color: var(--jet-gold);
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+        }
+
+        #service-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            font-size: 9px;
-            font-weight: 900;
-            padding: 8px;
-            border-radius: 10px;
-            transition: all 0.2s;
+            padding: 20px;
         }
 
-        .btn-wa { background: #25d366; color: white; }
-        .btn-save { background: rgba(255, 204, 0, 0.1); color: var(--jet-gold); border: 1px solid rgba(255, 204, 0, 0.1); }
-
-        .price-badge {
-            background: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-            font-size: 10px;
-            font-weight: 900;
-            padding: 4px 8px;
-            border-radius: 8px;
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Shimmer Effect for Loading */
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,204,0,0.05), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
         }
-
-        .delivery-tag {
-            font-size: 9px;
-            color: var(--jet-gold);
-            font-weight: 700;
-        }
-
-        @media (max-width: 640px) {
-            .hero-title { font-size: 3.5rem !important; }
-            .nav-btn { font-size: 9px; }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
     </style>
 </head>
-<body class="antialiased selection:bg-[#FFCC00] selection:text-black">
+<body class="antialiased">
 
-    <!-- Navbar -->
-    <nav class="fixed top-0 w-full z-[100] backdrop-blur-md border-b border-white/5" style="background-color: var(--bg-nav);">
-        <div class="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="showPage('home')">
-                <div class="w-10 h-10 bg-[#FFCC00] rounded-xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-bolt text-black text-lg"></i>
+    <!-- NAVIGATION BAR -->
+    <nav class="fixed top-0 w-full z-[100] backdrop-blur-xl border-b border-white/5" style="background-color: var(--bg-nav);">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="showPage('home')">
+                <div class="w-10 h-10 bg-[#FFCC00] rounded-xl flex items-center justify-center shadow-lg shadow-[#FFCC00]/20">
+                    <i class="fas fa-bolt text-black text-xl"></i>
                 </div>
-                <span class="text-xl font-black font-tech tracking-tighter uppercase">JET <span class="text-[#FFCC00]">OS</span></span>
+                <span class="text-xl font-black font-tech tracking-tighter uppercase hidden sm:block">JET <span class="text-[#FFCC00]">OS</span></span>
             </div>
 
-            <div class="hidden md:flex items-center gap-6 bg-black/20 px-6 py-2 rounded-full border border-white/5">
-                <button onclick="showPage('home')" class="nav-btn active" data-nav="home">الرئيسية</button>
-                <button onclick="showPage('market')" class="nav-btn" data-nav="market">جيت ماركت</button>
-                <button onclick="showPage('services')" class="nav-btn" data-nav="services">الخدمات</button>
-                <button onclick="showPage('wallet')" class="nav-btn" data-nav="wallet">المحفظة</button>
+            <!-- Enhanced Search Input -->
+            <div class="flex-1 max-w-md hidden md:block">
+                <div class="bg-white/5 border border-white/10 rounded-xl flex items-center px-4 py-2 focus-within:border-[#FFCC00] transition-all">
+                    <i class="fas fa-search text-gray-500 ml-3"></i>
+                    <input type="text" id="main-search" oninput="handleSearch(this.value)" data-t="search_placeholder" placeholder="بحث عن خدمات..." class="bg-transparent border-none outline-none w-full text-xs text-gray-400">
+                </div>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-6">
+                <button onclick="showPage('home')" class="nav-btn active uppercase" data-nav="home" data-t="nav_home">الرئيسية</button>
+                <button onclick="showPage('market')" class="nav-btn uppercase" data-nav="market" data-t="nav_market">الماركت</button>
+                <button onclick="showPage('services')" class="nav-btn uppercase" data-nav="services" data-t="nav_services">الخدمات</button>
+                <button onclick="showPage('about')" class="nav-btn uppercase" data-nav="about" data-t="nav_about">من نحن</button>
             </div>
 
             <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full flex items-center justify-center bg-white/5 text-[#FFCC00] border border-white/10">
-                    <i id="theme-icon" class="fas fa-moon text-sm"></i>
+                <button onclick="toggleTheme()" class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 hover:text-[#FFCC00]">
+                    <i id="theme-icon" class="fas fa-moon"></i>
                 </button>
-                <button onclick="showPage('wallet')" class="px-4 py-2 rounded-xl bg-[#FFCC00] text-black font-black text-[9px] uppercase shadow-md">
-                    <i class="fas fa-wallet"></i>
-                </button>
+                <button id="lang-btn" onclick="cycleLang()" class="text-[10px] font-black font-tech border border-white/10 px-3 py-1 rounded-md hover:border-[#FFCC00]">AR</button>
+                <button onclick="showPage('wallet')" class="w-9 h-9 rounded-lg bg-[#FFCC00] text-black flex items-center justify-center shadow-lg"><i class="fas fa-wallet"></i></button>
             </div>
         </div>
     </nav>
 
-    <main class="pt-20 pb-10">
-
-        <!-- 1. HOME -->
-        <section id="home" class="page-content active">
-            <div class="max-w-7xl mx-auto px-6 text-center mt-12 sm:mt-20">
-                <div class="inline-block px-3 py-1 rounded-full bg-[#FFCC00]/10 border border-[#FFCC00]/20 text-[#FFCC00] text-[9px] font-black uppercase tracking-widest mb-4">Beni Mellal Smart City</div>
-                <h1 class="hero-title text-5xl sm:text-7xl lg:text-9xl font-black font-tech mb-6 leading-none uppercase">
-                    JET <span class="text-[#FFCC00]">EVO</span>
-                </h1>
-                <p class="text-base sm:text-xl max-w-2xl mx-auto mb-10 opacity-70 leading-relaxed">
-                    نظام تشغيل الخدمات والأسواق في بني ملال. الأول من نوعه المبني على ميزانية المواطن.
-                </p>
-                <div class="flex justify-center gap-4">
-                    <button onclick="showPage('market')" class="bg-[#FFCC00] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-transform">دخول الماركت</button>
+    <main class="pt-24 pb-12">
+        
+        <!-- HOME PAGE -->
+        <section id="home" class="page-content active px-6 text-center pt-10">
+            <div class="max-w-3xl mx-auto">
+                <div class="inline-block bg-[#FFCC00]/10 border border-[#FFCC00]/20 text-[#FFCC00] text-[10px] font-bold px-4 py-1 rounded-full mb-6 uppercase tracking-widest">Beni-Mellal Smart City</div>
+                <h1 class="text-6xl md:text-8xl font-black font-tech mb-6 tracking-tighter uppercase leading-none">JET <span class="text-[#FFCC00]">EVO</span></h1>
+                <p data-t="home_desc" class="text-gray-400 text-lg mb-10 leading-relaxed max-w-2xl mx-auto">نظام التشغيل الذكي لمدينة بني ملال. كل احتياجاتك في منصة واحدة بلمسة زر.</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="showPage('services')" data-t="btn_discover" class="bg-[#FFCC00] text-black px-10 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-all">اكتشف الخدمات</button>
+                    <button class="bg-white/5 border border-white/10 px-10 py-4 rounded-2xl font-black text-xs uppercase hover:bg-white/10 transition-all">Download App</button>
                 </div>
             </div>
         </section>
 
-        <!-- 2. JET MARKET (Price-Focused) -->
-        <section id="market" class="page-content">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <!-- Smart Search -->
-                <div class="mb-10 mt-6">
-                    <div class="glass-card p-2 flex items-center gap-3">
-                        <i class="fas fa-search text-[#FFCC00] ml-3 mr-2"></i>
-                        <input type="text" placeholder="بحث ذكي بالأثمنة (مثلاً: غداء بـ 20 درهم)" class="bg-transparent border-none outline-none w-full text-xs font-bold py-2">
-                    </div>
-                </div>
-
-                <!-- Section: Deals & Steals -->
-                <div class="mb-12">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-black uppercase border-r-4 border-[#FFCC00] pr-3">أفضل قيمة (Deals)</h3>
-                    </div>
-                    <div id="market-deals" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        <!-- Dynamic Content -->
-                    </div>
-                </div>
-
-                <!-- Section: Budget Categories -->
-                <div id="market-sections">
-                    <!-- Loaded via JS: Economy ($), Mid ($$), Premium ($$$) -->
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. SERVICES -->
+        <!-- SERVICES PAGE -->
         <section id="services" class="page-content">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div id="services-container"></div>
+            <div class="sticky-filters px-6">
+                <div class="max-w-7xl mx-auto flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                    <button class="filter-chip active" onclick="filterServices('all')" data-t="filter_all">الكل</button>
+                    <button class="filter-chip" onclick="filterServices('home_serv')" data-t="cat_home">JET-الدار</button>
+                    <button class="filter-chip" onclick="filterServices('pro')" data-t="cat_pro">JET-برو</button>
+                    <button class="filter-chip" onclick="filterServices('sos')" data-t="cat_sos">JET-إغاثة</button>
+                    <button class="filter-chip" onclick="filterServices('tech')" data-t="cat_tech">JET-تقني</button>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-6 mt-8">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="services-grid">
+                    <!-- Services Injected Here -->
+                </div>
+                
+                <!-- No Results State -->
+                <div id="no-results" class="hidden text-center py-20">
+                    <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-search text-gray-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" data-t="no_results_title">مالقيناش هاد الخدمة</h3>
+                    <p class="text-gray-500 text-sm mb-6" data-t="no_results_desc">ولكن نقدروا نوجدوها ليك! تواصل معانا.</p>
+                    <a href="https://wa.me/212600000000" class="inline-block bg-[#FFCC00] text-black px-6 py-2 rounded-lg font-bold text-xs uppercase">WhatsApp JET</a>
+                </div>
             </div>
         </section>
 
-        <!-- 4. WALLET -->
-        <section id="wallet" class="page-content">
-            <div class="max-w-3xl mx-auto px-4 sm:px-6">
-                <div class="glass-card p-8 text-center mb-6">
-                    <h2 class="text-2xl font-black font-tech mb-2">المحفظة الذكية</h2>
-                    <p class="text-[9px] opacity-40 mb-4" id="user-id-display">...</p>
-                    <div class="flex justify-center gap-4">
-                         <div class="text-center">
-                             <p class="text-[10px] font-bold opacity-50 uppercase">Balance</p>
-                             <p class="text-xl font-black text-[#FFCC00]">0.00 <span class="text-[10px]">DH</span></p>
-                         </div>
+        <!-- ABOUT PAGE -->
+        <section id="about" class="page-content px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl font-black font-tech mb-8 uppercase" data-t="about_title">حول JET OS</h2>
+                <div class="grid md:grid-cols-2 gap-6 text-right" dir="rtl">
+                    <div class="glass-card p-8">
+                        <h3 class="text-[#FFCC00] font-bold mb-4">قصتنا</h3>
+                        <p class="text-gray-400 text-sm">بدأنا من قلب بني ملال، بهدف واحد: نرجعو الحياة أسهل باستعمال التكنولوجيا.</p>
                     </div>
-                </div>
-                <div id="ideas-list" class="space-y-3">
-                    <div class="text-center py-10 opacity-30 text-[10px] uppercase font-black tracking-widest">No Saved Ideas Yet</div>
+                    <div class="glass-card p-8">
+                        <h3 class="text-[#FFCC00] font-bold mb-4">أرقامنا</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><span class="block text-2xl font-black">+500</span> <span class="text-[10px] text-gray-500 uppercase">طلب ناجح</span></div>
+                            <div><span class="block text-2xl font-black">4.9</span> <span class="text-[10px] text-gray-500 uppercase">تقييم الكليان</span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
+
+        <!-- PLACEHOLDERS -->
+        <section id="market" class="page-content px-6 text-center"><h2 class="text-3xl font-tech uppercase">Marketplace</h2></section>
+        <section id="wallet" class="page-content px-6 text-center"><h2 class="text-3xl font-tech uppercase">Digital Wallet</h2></section>
 
     </main>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-[#FFCC00] text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-2xl opacity-0 pointer-events-none transition-all z-[300]">
-        Notification
+    <!-- SERVICE MODAL -->
+    <div id="service-modal" onclick="closeModal(event)">
+        <div class="glass-card max-w-lg w-full p-8 border-2 border-[#FFCC00]/30 relative animate-in fade-in zoom-in duration-300" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
+            <div id="modal-content"></div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'jet-os-v1';
-        let currentUser = null;
-
-        // Market Content
-        const marketData = {
-            deals: [
-                { name: "سناك علي", tag: "أرخص وجبة", price: "15 DH", delivery: "FAPOUR", icon: "fas fa-hamburger" },
-                { name: "محلبة السلام", tag: "توصيل 0 DH", price: "12 DH", delivery: "FREE", icon: "fas fa-blender" },
-                { name: "سندوتش تيكواي", tag: "الأكثر طلباً", price: "18 DH", delivery: "5 DH", icon: "fas fa-bread-slice" },
-                { name: "كافيه جيت", tag: "فطور اقتصادي", price: "20 DH", delivery: "FREE", icon: "fas fa-coffee" }
-            ],
-            categories: [
-                {
-                    title: "الفئة الاقتصادية ($)",
-                    items: [
-                        { name: "سناك النصر", avg: "غداء بـ 20 درهم", delivery: "5 DH", badge: "أفضل قيمة", desc: "سندوتشات كفتة ودجاج متنوعة" },
-                        { name: "محلبة الخير", avg: "فطور بـ 12 درهم", delivery: "3 DH", badge: "شعبية", desc: "عصائر طبيعية ومسمن" }
-                    ]
-                },
-                {
-                    title: "الفئة المتوسطة ($$)",
-                    items: [
-                        { name: "بيتزا روما", avg: "وجبة بـ 45 درهم", delivery: "10 DH", badge: "VIP", desc: "بيتزا إيطالية مخبوزة على الحطب" },
-                        { name: "طاجين بلادي", avg: "غداء بـ 55 درهم", delivery: "8 DH", badge: "صحي", desc: "طواجن مغربية أصيلة" }
-                    ]
-                },
-                {
-                    title: "الفئة الممتازة ($$$)",
-                    items: [
-                        { name: "مطعم البرج", avg: "عشاء بـ 120 درهم", delivery: "15 DH", badge: "Premium", desc: "أطباق عالمية وخدمة فاخرة" }
-                    ]
-                }
-            ]
-        };
-
-        const serviceData = [
-            {
-                group: "🏠 خدمات البيت",
-                items: [
-                    { name: "توصيل المؤونة", icon: "shopping-cart", desc: "لحوم، خضر، وفواكه من السوق." },
-                    { name: "غاز وبوطة", icon: "fire", desc: "تبديل البوطة في أقل من 20 دقيقة." }
-                ]
+        // LOCAL VSCODE FIX: Check if Firebase config exists. If not, bypass to allow UI to work.
+        let auth = null;
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+            } else {
+                console.warn("Firebase config not found. Running in UI-only mode for VS Code.");
             }
+        } catch (e) {
+            console.error("Firebase Initialization Error:", e);
+        }
+
+        // --- EXTENDED DATA (12 SERVICES) ---
+        const servicesData = [
+            // JET-الدار
+            { id: 1, category: "home_serv", title_ar: "خدمة-المؤونة", title_en: "Groceries", title_fr: "Courses", desc_ar: "نتقداو ليك أحسن ما كاين فالسويقة واللحم بجودة عالية.", price: "20 DH", eta: "30-45 min", icon: "fa-shopping-basket", featured: true },
+            { id: 2, category: "home_serv", title_ar: "مصبنة-إكسبريس", title_en: "Laundry", title_fr: "Pressing", desc_ar: "نجيو ناخدو الحوايج، نغسلوهم ونصلحوهم ونرجعوهم ليك فنهارهم.", price: "Sur devis", eta: "6-12h", icon: "fa-tshirt" },
+            { id: 3, category: "home_serv", title_ar: "توصيل-البوطة", title_en: "Gas Delivery", title_fr: "Livraison Gaz", desc_ar: "تقادات ليك البوطة؟ حنا نجيبوها ليك حتى لباب الدار.", price: "10 DH", eta: "15-20 min", icon: "fa-fire-alt" },
+            
+            // JET-برو
+            { id: 4, category: "pro", title_ar: "خدمة-الفحص", title_en: "Inspection", title_fr: "Contrôle", desc_ar: "نفحصو ليك أي سلعة قبل ما تشريها من أنترنت ونعطيوك تقرير.", price: "50 DH", eta: "Flexible", icon: "fa-check-double", featured: true },
+            { id: 5, category: "pro", title_ar: "الأمانة-برو", title_en: "Trust Courier", title_fr: "Courrier Confiance", desc_ar: "توصيل الوثائق والأغراض الثمينة بين المدن بضمانة JET.", price: "Sur devis", eta: "24h", icon: "fa-shield-alt" },
+            { id: 6, category: "pro", title_ar: "فحص-العقار", title_en: "Real Estate Check", title_fr: "Visite Immo", desc_ar: "بناء على طلبك، كنمشيو نشوفو الدار ولا المحل ونصورو ليك فيديو.", price: "100 DH", eta: "Same Day", icon: "fa-home" },
+            
+            // JET-إغاثة
+            { id: 7, category: "sos", title_ar: "خدمة-الدواء", title_en: "Pharmacy SOS", title_fr: "Pharmacie SOS", desc_ar: "توصيل الدواء من صيدلية الحراسة فأنصاف الليالي.", price: "30 DH", eta: "15-30 min", icon: "fa-pills", featured: true },
+            { id: 8, category: "sos", title_ar: "ديباناج-ميكانيك", title_en: "Roadside Assist", title_fr: "Dépannage", desc_ar: "طحتي أون بان؟ ميكانيكي JET يوصل عندك فين ما كنتي.", price: "Sur devis", eta: "20-40 min", icon: "fa-car-crash" },
+            { id: 9, category: "sos", title_ar: "فتح-السوارت", title_en: "Locksmith", title_fr: "Serrurier", desc_ar: "نسيتي السوارت لداخل؟ خبير السوارت ديالنا يحل ليك المشكل.", price: "Sur devis", eta: "15-25 min", icon: "fa-key" },
+
+            // JET-تقني
+            { id: 10, category: "tech", title_ar: "خدمة-مصلح", title_en: "Repair Pro", title_fr: "Réparateur", desc_ar: "إصلاح الهواتف والحواسيب مع خدمة الأخذ والإرجاع.", price: "Sur devis", eta: "24-48h", icon: "fa-tools", featured: true },
+            { id: 11, category: "tech", title_ar: "دعم-الويفي", title_en: "Wifi Support", title_fr: "Support Wifi", desc_ar: "مشاكل فالأنترنت؟ خبير تقني يجي يقاد ليك الريزو فالدار.", price: "50 DH", eta: "1-2h", icon: "fa-wifi" },
+            { id: 12, category: "tech", title_ar: "تركيب-التجهيزات", title_en: "Installation", title_fr: "Installation", desc_ar: "تركيب التلفاز، الثلاجة أو أي أجهزة منزلية جديدة.", price: "Sur devis", eta: "Flexible", icon: "fa-plug" },
         ];
 
-        // Functions
-        window.showPage = (id) => {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+        const translations = {
+            ar: {
+                nav_home: "الرئيسية", nav_market: "الماركت", nav_services: "الخدمات", nav_about: "من نحن", nav_wallet: "المحفظة",
+                search_placeholder: "قلب على: بوطة، دواء، مصلح...",
+                home_desc: "نظام التشغيل الذكي لمدينة بني ملال. كل احتياجاتك في منصة واحدة.",
+                btn_discover: "اكتشف الخدمات", filter_all: "الكل",
+                cat_home: "JET-الدار", cat_pro: "JET-برو", cat_sos: "JET-إغاثة", cat_tech: "JET-تقني",
+                order_now: "اطلب الآن عبر WhatsApp", price_label: "الثمن:", eta_label: "الوقت:",
+                no_results_title: "مالقيناش هاد الخدمة", no_results_desc: "ولكن نقدروا نوجدوها ليك! تواصل معانا.",
+                about_title: "حول JET OS", coming_soon: "قريباً..."
+            },
+            en: {
+                nav_home: "HOME", nav_market: "MARKET", nav_services: "SERVICES", nav_about: "ABOUT", nav_wallet: "WALLET",
+                search_placeholder: "Search: gas, medicine, repair...",
+                home_desc: "Smart OS for Beni-Mellal. Everything you need in one app.",
+                btn_discover: "Discover", filter_all: "All",
+                cat_home: "JET-Home", cat_pro: "JET-Pro", cat_sos: "JET-SOS", cat_tech: "JET-Tech",
+                order_now: "Order via WhatsApp", price_label: "Price:", eta_label: "ETA:",
+                no_results_title: "No Results Found", no_results_desc: "But we can make it happen! Contact us.",
+                about_title: "About JET OS", coming_soon: "Coming soon..."
+            },
+            fr: {
+                nav_home: "ACCUEIL", nav_market: "MARCHÉ", nav_services: "SERVICES", nav_about: "À PROPOS", nav_wallet: "WALLET",
+                search_placeholder: "Chercher: gaz, médicaments...",
+                home_desc: "L'OS intelligent pour Beni-Mellal. Tout sur une seule plateforme.",
+                btn_discover: "Découvrir", filter_all: "Tous",
+                cat_home: "JET-Maison", cat_pro: "JET-Pro", cat_sos: "JET-SOS", cat_tech: "JET-Tech",
+                order_now: "Commander via WhatsApp", price_label: "Prix:", eta_label: "Temps:",
+                no_results_title: "Aucun Résultat", no_results_desc: "On peut quand même vous aider! Contactez-nous.",
+                about_title: "À Propos", coming_soon: "Bientôt..."
+            }
+        };
+
+        let currentLang = 'ar';
+        let currentFilter = 'all';
+
+        // --- ENHANCED CORE FUNCTIONS ---
+
+        window.renderServices = (dataToRender = servicesData) => {
+            const grid = document.getElementById('services-grid');
+            const noResults = document.getElementById('no-results');
+            if(!grid) return;
+            
+            grid.innerHTML = '';
+            
+            if (dataToRender.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+            
+            dataToRender.forEach(s => {
+                const title = s[`title_${currentLang}`];
+                const card = document.createElement('div');
+                card.className = "glass-card p-5 cursor-pointer flex flex-col items-center text-center relative overflow-hidden group";
+                if (s.featured) card.innerHTML += `<div class="absolute top-0 right-0 bg-[#FFCC00] text-black text-[8px] font-black px-3 py-1 rounded-bl-lg uppercase tracking-tighter">Best</div>`;
+                
+                card.onclick = () => openModal(s);
+                card.innerHTML += `
+                    <div class="w-14 h-14 bg-[#FFCC00]/5 rounded-2xl flex items-center justify-center mb-4 border border-[#FFCC00]/10 group-hover:bg-[#FFCC00]/20 transition-all">
+                        <i class="fas ${s.icon} text-[#FFCC00] text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-sm mb-2 group-hover:text-[#FFCC00] transition-colors">${title}</h3>
+                    <div class="flex items-center gap-1 text-[10px] text-gray-500">
+                        <i class="fas fa-star text-[#FFCC00] scale-75"></i> 4.9 • ${s.price}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        window.handleSearch = (val) => {
+            const query = val.toLowerCase();
+            const filtered = servicesData.filter(s => {
+                const matchTitle = (s[`title_${currentLang}`] || "").toLowerCase().includes(query);
+                const matchCat = (s.category || "").toLowerCase().includes(query);
+                return matchTitle || matchCat;
+            });
+            renderServices(filtered);
+        };
+
+        window.filterServices = (cat) => {
+            currentFilter = cat;
+            document.querySelectorAll('.filter-chip').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('onclick').includes(cat));
+            });
+            
+            const grid = document.getElementById('services-grid');
+            if(grid) grid.style.opacity = '0.3';
             setTimeout(() => {
-                document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+                const filtered = cat === 'all' ? servicesData : servicesData.filter(s => s.category === cat);
+                renderServices(filtered);
+                if(grid) grid.style.opacity = '1';
+            }, 200);
+        };
+
+        window.openModal = (service) => {
+            const modal = document.getElementById('service-modal');
+            const content = document.getElementById('modal-content');
+            const title = service[`title_${currentLang}`];
+            const desc = service[`desc_${currentLang}`];
+            const whatsappMsg = encodeURIComponent(`السلام عليكم JET، بغيت نطلب خدمة: ${title}. هاهو اللوكاسيون ديالي: [Location]`);
+            
+            content.innerHTML = `
+                <div class="flex items-center gap-4 mb-6" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
+                    <div class="w-20 h-20 bg-[#FFCC00] rounded-3xl flex items-center justify-center text-black shadow-2xl shadow-[#FFCC00]/20">
+                        <i class="fas ${service.icon} text-3xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-black font-tech text-[#FFCC00] leading-tight">${title}</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="bg-white/10 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest text-gray-300">Verified Service</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm leading-relaxed mb-8 text-right" dir="rtl">${desc}</p>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                        <span class="block text-[10px] text-gray-500 uppercase mb-1">${translations[currentLang].price_label}</span>
+                        <span class="font-black text-xl text-[#FFCC00]">${service.price}</span>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                        <span class="block text-[10px] text-gray-500 uppercase mb-1">${translations[currentLang].eta_label}</span>
+                        <span class="font-black text-xl text-white">${service.eta}</span>
+                    </div>
+                </div>
+                <a href="https://wa.me/212600000000?text=${whatsappMsg}" target="_blank" class="w-full bg-[#FFCC00] text-black py-5 rounded-2xl font-black text-center block text-sm shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3">
+                    <i class="fab fa-whatsapp text-xl"></i> ${translations[currentLang].order_now}
+                </a>
+            `;
+            modal.style.display = 'flex';
+        };
+
+        window.closeModal = () => document.getElementById('service-modal').style.display = 'none';
+
+        window.cycleLang = () => {
+            const langs = ['ar', 'en', 'fr'];
+            currentLang = langs[(langs.indexOf(currentLang) + 1) % langs.length];
+            updateUILanguage();
+            renderServices();
+        };
+
+        function updateUILanguage() {
+            const langBtn = document.getElementById('lang-btn');
+            if(langBtn) langBtn.innerText = currentLang.toUpperCase();
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-t]').forEach(el => {
+                const key = el.getAttribute('data-t');
+                if (translations[currentLang][key]) {
+                    el.tagName === 'INPUT' ? el.placeholder = translations[currentLang][key] : el.innerText = translations[currentLang][key];
+                }
+            });
+        }
+
+        window.showPage = (id) => {
+            document.querySelectorAll('.page-content').forEach(p => {
+                p.classList.remove('active');
+                setTimeout(() => p.style.display = 'none', 300);
+            });
+            setTimeout(() => {
                 const target = document.getElementById(id);
-                target.style.display = 'block';
-                setTimeout(() => target.classList.add('active'), 20);
+                if(target) {
+                    target.style.display = 'block';
+                    setTimeout(() => target.classList.add('active'), 50);
+                }
             }, 300);
-            document.querySelectorAll('[data-nav]').forEach(n => n.classList.toggle('active', n.dataset.nav === id));
+            document.querySelectorAll('[data-nav]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.nav === id);
+            });
         };
 
         window.toggleTheme = () => {
-            const current = document.documentElement.getAttribute('data-theme');
-            const target = current === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', target);
-            document.getElementById('theme-icon').className = target === 'light' ? 'fas fa-sun text-sm' : 'fas fa-moon text-sm';
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('theme-icon');
+            if(icon) icon.className = document.body.classList.contains('light-mode') ? 'fas fa-sun' : 'fas fa-moon';
         };
 
-        function renderMarket() {
-            const deals = document.getElementById('market-deals');
-            deals.innerHTML = marketData.deals.map(d => `
-                <div class="glass-card p-4 flex flex-col justify-between h-full border-dashed border-[#FFCC00]/30">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="bg-[#FFCC00] text-black text-[7px] font-black px-2 py-0.5 rounded">${d.tag}</span>
-                        <i class="${d.icon} text-[#FFCC00] text-sm"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-[11px] font-black">${d.name}</h4>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-xs font-black text-[#10b981]">${d.price}</span>
-                            <span class="delivery-tag text-[8px] uppercase">${d.delivery}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            const sections = document.getElementById('market-sections');
-            sections.innerHTML = marketData.categories.map(cat => `
-                <div class="mb-10">
-                    <h3 class="service-group-title text-sm uppercase">${cat.title}</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${cat.items.map(item => `
-                            <div class="glass-card p-5 flex items-center justify-between group">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-[#FFCC00]">
-                                        <i class="fas fa-store"></i>
-                                    </div>
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <h4 class="text-xs font-black">${item.name}</h4>
-                                            <span class="text-[8px] px-2 py-0.5 rounded bg-[#FFCC00]/10 text-[#FFCC00] font-bold">${item.badge}</span>
-                                        </div>
-                                        <p class="text-[9px] opacity-40 mt-1">${item.desc}</p>
-                                        <div class="flex items-center gap-4 mt-2">
-                                            <span class="text-[10px] font-black text-[#10b981]">${item.avg}</span>
-                                            <span class="text-[9px] font-bold opacity-60"><i class="fas fa-motorcycle mr-1"></i> ${item.delivery}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button onclick="saveIdea('Request: ${item.name}')" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#FFCC00] hover:text-black transition-colors">
-                                    <i class="fas fa-plus text-xs"></i>
-                                </button>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderServices() {
-            const container = document.getElementById('services-container');
-            container.innerHTML = serviceData.map(group => `
-                <div>
-                    <h3 class="service-group-title uppercase">${group.group}</h3>
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        ${group.items.map(item => `
-                            <div class="glass-card p-5 text-center">
-                                <div class="w-12 h-12 bg-[#FFCC00]/10 text-[#FFCC00] rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <i class="fas fa-${item.icon} text-lg"></i>
-                                </div>
-                                <h4 class="text-xs font-black mb-1">${item.name}</h4>
-                                <p class="text-[9px] opacity-40 mb-4">${item.desc}</p>
-                                <button onclick="saveIdea('Service: ${item.name}')" class="action-btn btn-save w-full">حفظ في القائمة</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.saveIdea = async (text) => {
-            if (!currentUser) return showToast("Authenticating...");
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'ideas'), {
-                    text,
-                    timestamp: serverTimestamp()
-                });
-                showToast(`تم الحفظ: ${text}`);
-            } catch (e) { console.error(e); }
-        };
-
-        function showToast(m) {
-            const t = document.getElementById('toast');
-            t.innerText = m; t.style.opacity = '1';
-            setTimeout(() => t.style.opacity = '0', 2500);
-        }
-
-        // Firebase Auth & Data
-        onAuthStateChanged(auth, u => {
-            if (u) {
-                currentUser = u;
-                document.getElementById('user-id-display').innerText = `ID: ${u.uid}`;
-                
-                // Real-time listener for ideas
-                const q = query(collection(db, 'artifacts', appId, 'users', u.uid, 'ideas'), orderBy('timestamp', 'desc'));
-                onSnapshot(q, snapshot => {
-                    const list = document.getElementById('ideas-list');
-                    if(snapshot.empty) return;
-                    list.innerHTML = snapshot.docs.map(doc => `
-                        <div class="glass-card p-4 flex justify-between items-center">
-                            <span class="text-xs font-bold">${doc.data().text}</span>
-                            <span class="text-[8px] opacity-30">${new Date(doc.data().timestamp?.toDate()).toLocaleDateString()}</span>
-                        </div>
-                    `).join('');
-                }, err => console.log(err));
+        // Standard initialization
+        window.addEventListener('load', async () => {
+            updateUILanguage();
+            renderServices();
+            if (auth) {
+                try {
+                    await signInAnonymously(auth);
+                    console.log("Authenticated with Firebase");
+                } catch (e) {
+                    console.error("Auth Error:", e);
+                }
             }
         });
-
-        // Initialize
-        window.onload = async () => {
-            renderMarket();
-            renderServices();
-            await signInAnonymously(auth);
-        };
     </script>
 </body>
 </html>
