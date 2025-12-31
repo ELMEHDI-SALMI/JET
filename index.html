@@ -2,475 +2,654 @@
 <html lang="ar" dir="rtl" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JET OS | Phase 2: Advanced Services Catalog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>JET OS | جيت أوس - الرفاهية الرقمية</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/48/jet.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Orbitron:wght@700;900&display=swap');
         
         :root { 
-            --bg-body: #050505; 
-            --text-main: #ffffff;
-            --bg-nav: rgba(5, 5, 5, 0.9); 
             --jet-gold: #FFCC00; 
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --border-color: rgba(255, 204, 0, 0.1); 
-        }
-
-        body.light-mode {
-            --bg-body: #f8f9fa;
-            --text-main: #1a1a1a;
-            --bg-nav: rgba(248, 249, 250, 0.9);
-            --glass-bg: rgba(0, 0, 0, 0.03);
-            --border-color: rgba(0, 0, 0, 0.1);
+            --bg-dark: #020202;
+            --card-glass: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --glow-color: rgba(255, 204, 0, 0.1);
+            --whatsapp-green: #25D366;
         }
 
         body { 
             font-family: 'Cairo', sans-serif; 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            overflow-x: hidden; 
-            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: var(--bg-dark); 
+            color: white; 
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
         }
-        
+
+        /* 3D Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
         .font-tech { font-family: 'Orbitron', sans-serif; }
 
-        .page-content { 
-            display: none; 
-            opacity: 0; 
-            transform: translateY(15px); 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        .page-content.active { 
-            display: block; 
-            opacity: 1; 
-            transform: translateY(0); 
+        .glass {
+            background: var(--card-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-glass);
         }
 
-        .nav-btn { 
-            font-size: 11px; 
-            font-weight: 800; 
-            color: #666; 
-            text-transform: uppercase; 
-            transition: 0.3s;
+        /* Fixed Contact Bar */
+        .fixed-contact-bar { 
+            position: fixed; 
+            bottom: 110px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 92%; 
+            max-width: 400px; 
+            z-index: 9998; 
+            display: flex; 
+            gap: 12px;
+            padding: 4px;
         }
-        .nav-btn.active { color: var(--jet-gold); }
+        
+        .contact-btn { 
+            flex: 1; 
+            height: 58px; 
+            border-radius: 22px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            font-size: 14px; 
+            font-weight: 900; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        
+        .contact-btn:active { transform: scale(0.92); }
+        .btn-call { background: var(--jet-gold); color: black; }
+        .btn-wa { background: rgba(37, 211, 102, 0.1); color: var(--whatsapp-green); border: 1px solid rgba(37, 211, 102, 0.3); }
 
-        .glass-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-        .glass-card:hover {
-            border-color: var(--jet-gold);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.05);
-        }
-
-        .sticky-filters {
-            position: sticky;
-            top: 80px;
-            z-index: 50;
-            background: var(--bg-body);
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .filter-chip {
-            padding: 8px 18px;
-            border-radius: 14px;
-            font-size: 12px;
-            font-weight: bold;
-            background: var(--glass-bg);
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.3s;
-        }
-        .filter-chip.active {
-            background: var(--jet-gold);
-            color: #000;
-            border-color: var(--jet-gold);
-            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
-        }
-
-        #service-modal {
-            display: none;
+        /* Navigation Dock */
+        .mobile-nav {
             position: fixed;
-            inset: 0;
-            z-index: 200;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 420px;
+            z-index: 9999;
+            border-radius: 35px;
+            padding: 12px;
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(30px);
+            display: flex;
+            justify-content: space-around;
         }
+
+        .nav-item { color: rgba(255,255,255,0.2); transition: 0.4s; }
+        .nav-item.active { color: var(--jet-gold); transform: translateY(-3px); }
+
+        .gold-grad {
+            background: linear-gradient(to bottom, #fff 30%, #FFCC00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page { display: none; opacity: 0; transform: translateY(15px); transition: 0.5s ease-out; }
+        .page.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* Marketing Marquee */
+        .marquee { overflow: hidden; white-space: nowrap; background: var(--jet-gold); color: black; padding: 5px 0; font-weight: 900; font-size: 10px; text-transform: uppercase; }
+        .marquee-content { display: inline-block; animation: marquee 25s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        .badge-premium { background: linear-gradient(45deg, #FFCC00, #B8860B); padding: 2px 10px; border-radius: 5px; color: black; font-size: 8px; font-weight: 900; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Shimmer Effect for Loading */
-        .shimmer {
-            background: linear-gradient(90deg, transparent, rgba(255,204,0,0.05), transparent);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+        /* New Privacy/Security Icon Animation */
+        .shield-shimmer {
+            animation: shield-glow 2s infinite alternate;
         }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+        @keyframes shield-glow {
+            from { filter: drop-shadow(0 0 2px rgba(255,204,0,0.2)); }
+            to { filter: drop-shadow(0 0 10px rgba(255,204,0,0.5)); }
+        }
+
+        /* Icon Container Hover Effect */
+        .service-card:active i {
+            transform: scale(1.2);
+            transition: 0.2s;
+        }
+        /* Step Process Styles */
+        .step-card::before {
+            content: '';
+            position: absolute;
+            right: 24px;
+            top: 60px;
+            bottom: -20px;
+            width: 1px;
+            background: linear-gradient(to bottom, var(--jet-gold), transparent);
+            z-index: 0;
+        }
+        .step-card:last-child::before { display: none; }
+
+        .pulse-border {
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 204, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="no-scrollbar">
 
-    <!-- NAVIGATION BAR -->
-    <nav class="fixed top-0 w-full z-[100] backdrop-blur-xl border-b border-white/5" style="background-color: var(--bg-nav);">
-        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="showPage('home')">
-                <div class="w-10 h-10 bg-[#FFCC00] rounded-xl flex items-center justify-center shadow-lg shadow-[#FFCC00]/20">
-                    <i class="fas fa-bolt text-black text-xl"></i>
+    <!-- 3D Background Layer -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Top Marketing Bar -->
+    <div class="marquee fixed top-0 z-[2000] w-full shadow-lg">
+        <div class="marquee-content">
+            توصيل فائق السرعة فبني ملال • خصوصية بياناتكم أولويتنا • خدمة VIP 24/7 • أمان تام لطلباتكم • جيت أوس: نخدمكم بامتياز • نظام تشفير الطلبات مفعل •
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-8 w-full z-[1000] p-6">
+        <div class="max-w-4xl mx-auto flex items-center justify-between glass px-5 py-3 rounded-[25px]">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showPage('home')">
+                <div class="w-9 h-9 bg-white text-black rounded-xl flex items-center justify-center font-black text-xl shadow-lg">J</div>
+                <div class="flex flex-col">
+                    <span class="font-tech text-md font-black tracking-tighter uppercase">JET<span class="text-[#FFCC00]">OS</span></span>
+                    <span class="text-[7px] font-bold text-gray-500 uppercase tracking-widest">Premium Concierge</span>
                 </div>
-                <span class="text-xl font-black font-tech tracking-tighter uppercase hidden sm:block">JET <span class="text-[#FFCC00]">OS</span></span>
             </div>
-
-            <!-- Enhanced Search Input -->
-            <div class="flex-1 max-w-md hidden md:block">
-                <div class="bg-white/5 border border-white/10 rounded-xl flex items-center px-4 py-2 focus-within:border-[#FFCC00] transition-all">
-                    <i class="fas fa-search text-gray-500 ml-3"></i>
-                    <input type="text" id="main-search" oninput="handleSearch(this.value)" data-t="search_placeholder" placeholder="بحث عن خدمات..." class="bg-transparent border-none outline-none w-full text-xs text-gray-400">
-                </div>
-            </div>
-
-            <div class="hidden lg:flex items-center gap-6">
-                <button onclick="showPage('home')" class="nav-btn active uppercase" data-nav="home" data-t="nav_home">الرئيسية</button>
-                <button onclick="showPage('market')" class="nav-btn uppercase" data-nav="market" data-t="nav_market">الماركت</button>
-                <button onclick="showPage('services')" class="nav-btn uppercase" data-nav="services" data-t="nav_services">الخدمات</button>
-                <button onclick="showPage('about')" class="nav-btn uppercase" data-nav="about" data-t="nav_about">من نحن</button>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()" class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 hover:text-[#FFCC00]">
-                    <i id="theme-icon" class="fas fa-moon"></i>
-                </button>
-                <button id="lang-btn" onclick="cycleLang()" class="text-[10px] font-black font-tech border border-white/10 px-3 py-1 rounded-md hover:border-[#FFCC00]">AR</button>
-                <button onclick="showPage('wallet')" class="w-9 h-9 rounded-lg bg-[#FFCC00] text-black flex items-center justify-center shadow-lg"><i class="fas fa-wallet"></i></button>
+            <div class="flex items-center gap-2">
+                <i class="fas fa-user-shield text-[#FFCC00] text-xs"></i>
+                <div class="badge-premium">SECURE OS</div>
             </div>
         </div>
+    </header>
+
+    <!-- FIXED CONTACT BAR -->
+    <div class="fixed-contact-bar">
+        <button onclick="handleCall()" class="contact-btn btn-call shadow-xl shadow-yellow-500/10">
+            <i class="fas fa-phone-alt"></i>
+            <span>إتصال مباشر</span>
+        </button>
+        <button onclick="handleWhatsApp()" class="contact-btn btn-wa shadow-xl shadow-green-500/10">
+            <i class="fab fa-whatsapp"></i>
+            <span>واتساب JET</span>
+        </button>
+    </div>
+
+    <!-- Navigation Dock -->
+    <nav class="mobile-nav">
+        <button onclick="showPage('home')" class="nav-item active" data-page="home"><i class="fas fa-home-alt text-xl"></i></button>
+        <button onclick="showPage('services')" class="nav-item" data-page="services"><i class="fas fa-th-large text-xl"></i></button>
+        <button onclick="showPage('concierge')" class="nav-item" data-page="concierge"><i class="fas fa-wand-magic-sparkles text-xl"></i></button>
+        <button onclick="showPage('support')" class="nav-item" data-page="support"><i class="fas fa-headset text-xl"></i></button>
+        <button onclick="showPage('elite')" class="nav-item" data-page="elite"><i class="fas fa-crown text-xl"></i></button>
+        <button onclick="showPage('about')" class="nav-item" data-page="about"><i class="fas fa-circle-info text-xl"></i></button>
+        
     </nav>
 
-    <main class="pt-24 pb-12">
+    <main class="pt-32 pb-52">
+                <!-- ABOUT US PAGE - OPTIMIZED -->
+        <section id="about" class="page px-7">
+            <!-- Hero Identity -->
+            <div class="mb-10 text-right">
+                <h2 class="text-4xl font-black mb-2 gold-grad uppercase font-tech tracking-tighter">THE CORE</h2>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] leading-none mb-8">فلسفة التشغيل والتميز</p>
+                
+                <div class="relative w-full aspect-video rounded-[40px] overflow-hidden mb-10 group">
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover brightness-50 grayscale group-active:grayscale-0 transition-all duration-700" alt="Beni Mellal Luxury">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                    <div class="absolute bottom-6 right-6 text-right">
+                        <div class="badge-premium mb-2 inline-block">تأسس في بني ملال</div>
+                        <h3 class="text-xl font-black">نظام الرفاهية الرقمي</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Philosophy -->
+            <div class="space-y-6 mb-12">
+                <div class="glass p-8 rounded-[40px] text-right border-white/5 relative overflow-hidden">
+                    <i class="fas fa-quote-right absolute top-6 left-6 text-white/5 text-6xl"></i>
+                    <h3 class="text-xl font-black mb-4 relative z-10">لماذا JET OS؟</h3>
+                    <p class="text-[13px] text-gray-400 font-bold leading-relaxed relative z-10">
+                        في مدينة كبني ملال، الوقت والخصوصية هما أغلى ما يملكه الإنسان. <span class="text-[#FFCC00]">JET OS</span> ليس تطبيقاً عادياً، بل هو بروتوكول خدمة تم تصميمه ليتجاوز توقعاتك. نحن نؤمن أن الفخامة تكمن في "عدم الشعور بالجهد".
+                    </p>
+                </div>
+
+                <!-- Numbers Speak -->
+                <div class="grid grid-cols-3 gap-3 text-center mb-8">
+                    <div class="glass p-4 rounded-3xl">
+                        <div class="text-[#FFCC00] font-tech text-xl font-black">15min</div>
+                        <div class="text-[8px] text-gray-500 font-bold uppercase">متوسط السرعة</div>
+                    </div>
+                    <div class="glass p-4 rounded-3xl">
+                        <div class="text-[#FFCC00] font-tech text-xl font-black">100%</div>
+                        <div class="text-[8px] text-gray-500 font-bold uppercase">تشفير البيانات</div>
+                    </div>
+                    <div class="glass p-4 rounded-3xl">
+                        <div class="text-[#FFCC00] font-tech text-xl font-black">24h</div>
+                        <div class="text-[8px] text-gray-500 font-bold uppercase">جاهزية تامة</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How We Operate (The Process) -->
+            <div class="mb-12 text-right">
+                <h3 class="text-2xl font-black mb-8 px-2">كيف نعمل؟</h3>
+                <div class="space-y-8">
+                    <!-- Step 1 -->
+                    <div class="flex gap-6 relative step-card text-right">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-black text-white mb-2">01. الاستقبال الذكي</h4>
+                            <p class="text-[11px] text-gray-500 font-bold leading-relaxed">بمجرد تواصلك، يتم تصنيف طلبك عبر نظامنا الذكي لتحديد أقرب وكيل "JET" متخصص.</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full glass border-[#FFCC00]/30 flex items-center justify-center relative z-10 pulse-border">
+                            <i class="fas fa-comment-dots text-[#FFCC00]"></i>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flex gap-6 relative step-card text-right">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-black text-white mb-2">02. التنفيذ الصامت</h4>
+                            <p class="text-[11px] text-gray-500 font-bold leading-relaxed">يتحرك فريقنا بسرعة البرق دون إزعاج، مع الحفاظ على سرية هويتك ومكان تواجدك.</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full glass border-[#FFCC00]/30 flex items-center justify-center relative z-10">
+                            <i class="fas fa-user-ninja text-[#FFCC00]"></i>
+                        </div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flex gap-6 relative step-card text-right">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-black text-white mb-2">03. الإغلاق والتشفير</h4>
+                            <p class="text-[11px] text-gray-500 font-bold leading-relaxed">عند التسليم، يتم إغلاق المهمة وحذف سجل المحادثات تقنياً لضمان خصوصيتك الأبدية.</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full glass border-[#FFCC00]/30 flex items-center justify-center relative z-10">
+                            <i class="fas fa-lock text-[#FFCC00]"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Promise -->
+            <div class="glass p-8 rounded-[40px] text-center border-emerald-500/10 bg-gradient-to-t from-emerald-500/5 to-transparent">
+                <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check-double text-emerald-500 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-black mb-3">وعدنا لكم</h3>
+                <p class="text-[11px] text-gray-400 font-bold leading-loose">
+                    نحن لا نبيع الخدمات، نحن نبيع "راحة البال". كل مهمة نقوم بها هي عقد ثقة بيننا وبينكم، ولن نخذلكم أبداً.
+                </p>
+            </div>
+        </section>
         
         <!-- HOME PAGE -->
-        <section id="home" class="page-content active px-6 text-center pt-10">
-            <div class="max-w-3xl mx-auto">
-                <div class="inline-block bg-[#FFCC00]/10 border border-[#FFCC00]/20 text-[#FFCC00] text-[10px] font-bold px-4 py-1 rounded-full mb-6 uppercase tracking-widest">Beni-Mellal Smart City</div>
-                <h1 class="text-6xl md:text-8xl font-black font-tech mb-6 tracking-tighter uppercase leading-none">JET <span class="text-[#FFCC00]">EVO</span></h1>
-                <p data-t="home_desc" class="text-gray-400 text-lg mb-10 leading-relaxed max-w-2xl mx-auto">نظام التشغيل الذكي لمدينة بني ملال. كل احتياجاتك في منصة واحدة بلمسة زر.</p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button onclick="showPage('services')" data-t="btn_discover" class="bg-[#FFCC00] text-black px-10 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-all">اكتشف الخدمات</button>
-                    <button class="bg-white/5 border border-white/10 px-10 py-4 rounded-2xl font-black text-xs uppercase hover:bg-white/10 transition-all">Download App</button>
+        <section id="home" class="page active px-7">
+            <div class="mb-12 text-center">
+                <h1 class="font-black font-tech mb-4 leading-[0.8] tracking-tighter">
+                    <span class="block gold-grad text-6xl">BEYOND</span>
+                    <span class="block text-white opacity-90 text-5xl">DELIVERY</span>
+                </h1>
+                <p class="text-gray-500 text-xs font-bold mb-8 leading-relaxed px-6">
+                    مرحباً كمال. جيت أوس نظام يضمن خصوصيتك ويوفر لك كافة احتياجاتك في بني ملال.
+                </p>
+                
+                <!-- Trust & Security Banner -->
+                <div class="glass p-5 rounded-[25px] border-[#FFCC00]/10 flex items-center gap-4 mb-8 text-right">
+                    <div class="w-12 h-12 rounded-full bg-[#FFCC00]/5 flex items-center justify-center shield-shimmer">
+                        <i class="fas fa-fingerprint text-[#FFCC00] text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[10px] font-black uppercase text-[#FFCC00]">حماية البيانات القصوى</h4>
+                        <p class="text-[9px] text-gray-400 font-bold leading-tight">جميع طلباتك ومعلوماتك مشفرة ومحمية بالكامل.</p>
+                    </div>
+                </div>
+
+                <!-- Call to Action Card -->
+                <div class="glass p-8 rounded-[40px] relative overflow-hidden active:scale-95 transition-all text-right border-[#FFCC00]/20" onclick="handleCall()">
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-[#FFCC00] text-black rounded-2xl flex items-center justify-center text-xl mb-6 shadow-xl">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <h3 class="text-2xl font-black mb-2">اطلب بخصوصية</h3>
+                        <p class="text-[11px] text-gray-400 font-bold leading-relaxed">طلبك يتم معالجته بسرية تامة واحترافية عالية.</p>
+                    </div>
+                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-[#FFCC00]/5 rounded-full blur-3xl"></div>
                 </div>
             </div>
         </section>
 
         <!-- SERVICES PAGE -->
-        <section id="services" class="page-content">
-            <div class="sticky-filters px-6">
-                <div class="max-w-7xl mx-auto flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                    <button class="filter-chip active" onclick="filterServices('all')" data-t="filter_all">الكل</button>
-                    <button class="filter-chip" onclick="filterServices('home_serv')" data-t="cat_home">JET-الدار</button>
-                    <button class="filter-chip" onclick="filterServices('pro')" data-t="cat_pro">JET-برو</button>
-                    <button class="filter-chip" onclick="filterServices('sos')" data-t="cat_sos">JET-إغاثة</button>
-                    <button class="filter-chip" onclick="filterServices('tech')" data-t="cat_tech">JET-تقني</button>
-                </div>
+        <section id="services" class="page px-7">
+            <div class="mb-10 text-right">
+                <h2 class="text-3xl font-black mb-2">الخدمات المتكاملة</h2>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">مستوى جديد من الرفاهية (16 خدمة)</p>
             </div>
-
-            <div class="max-w-7xl mx-auto px-6 mt-8">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="services-grid">
-                    <!-- Services Injected Here -->
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('محتاج نطلب ماكلة من المطعم:')">
+                    <i class="fas fa-burger text-orange-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">المطاعم</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">توصيل الوجبات الساخنة</p>
                 </div>
-                
-                <!-- No Results State -->
-                <div id="no-results" class="hidden text-center py-20">
-                    <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-search text-gray-600 text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2" data-t="no_results_title">مالقيناش هاد الخدمة</h3>
-                    <p class="text-gray-500 text-sm mb-6" data-t="no_results_desc">ولكن نقدروا نوجدوها ليك! تواصل معانا.</p>
-                    <a href="https://wa.me/212600000000" class="inline-block bg-[#FFCC00] text-black px-6 py-2 rounded-lg font-bold text-xs uppercase">WhatsApp JET</a>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('محتاج نتقدا شي حوايج من المارشي:')">
+                    <i class="fas fa-cart-shopping text-blue-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">المارشي</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">تقدية المنزل المختارة</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('محتاج دواء ضروري:')">
+                    <i class="fas fa-heart-pulse text-red-500 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">الأدوية</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">توصيل مستعجل 24/7</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card border-emerald-500/20" onclick="handleWhatsApp('بغيت نسحب فلوس الـ E-commerce ديالي:')">
+                    <i class="fas fa-vault text-emerald-500 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">سحب الأموال</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">سحب أرباح الـ Ecommerce</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('محتاج نوصل مفاتيح أو أمانة:')">
+                    <i class="fas fa-unlock-keyhole text-yellow-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">المفاتيح</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">توصيل الأمانات والوثائق</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card border-[#FFCC00]/20" onclick="handleWhatsApp('بغيت نهز الرحيل:')">
+                    <i class="fas fa-dolly text-[#FFCC00] text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">هز الرحيل</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">نقل الأثاث باحترافية</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('محتاج نرسل هدية:')">
+                    <i class="fas fa-gift text-pink-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">الهدايا</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">تنسيق وتوصيل المفاجآت</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card border-blue-500/20" onclick="handleWhatsApp('كنقلب على خدام أو كنقلب على خدمة:')">
+                    <i class="fas fa-briefcase text-blue-500 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">تشغيل / عمل</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">البحث عن عمال أو وظيفة</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('محتاج بوطة عاجلة:')">
+                    <i class="fas fa-gas-pump text-gray-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">البوطة</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">تغيير قنينة الغاز فوراً</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('بغيت نخلص فواتير:')">
+                    <i class="fas fa-money-bill-transfer text-emerald-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">الفواتير</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">أداء فواتير الماء والكهرباء</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card border-purple-500/20" onclick="handleWhatsApp('محتاج بلومبي أو تريسيان:')">
+                    <i class="fas fa-screwdriver-wrench text-purple-500 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">صيانة منزلية</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">إصلاحات الأعطال فوراً</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('عندي غرض إداري:')">
+                    <i class="fas fa-file-shield text-cyan-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">وثائق إدارية</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">قضاء الأغراض الإدارية</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('بغيت نجيب طرد من CTM/AMANA:')">
+                    <i class="fas fa-truck-ramp-box text-indigo-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">الطرود</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">استلام طرود CTM و الامانة</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('محتاج نوصل ورد:')">
+                    <i class="fas fa-leaf text-green-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">الورد</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">توصيل الورود والمزروعات</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('محتاج خدمة تنظيف:')">
+                    <i class="fas fa-spray-can-sparkles text-purple-400 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">التنظيف</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">توصيل أدوات التنظيف الخاصة</p>
+                </div>
+                <div class="glass p-5 rounded-[30px] service-card" onclick="handleWhatsApp('طلب عاجل جداً:')">
+                    <i class="fas fa-gauge-high text-yellow-500 text-2xl mb-4 block"></i>
+                    <h4 class="text-xs font-black mb-1">طلبات عاجلة</h4>
+                    <p class="text-[8px] text-gray-500 font-bold uppercase leading-tight">خدمة الطوارئ فقل من 15د</p>
                 </div>
             </div>
         </section>
 
-        <!-- ABOUT PAGE -->
-        <section id="about" class="page-content px-6">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-4xl font-black font-tech mb-8 uppercase" data-t="about_title">حول JET OS</h2>
-                <div class="grid md:grid-cols-2 gap-6 text-right" dir="rtl">
-                    <div class="glass-card p-8">
-                        <h3 class="text-[#FFCC00] font-bold mb-4">قصتنا</h3>
-                        <p class="text-gray-400 text-sm">بدأنا من قلب بني ملال، بهدف واحد: نرجعو الحياة أسهل باستعمال التكنولوجيا.</p>
+        <!-- CONCIERGE -->
+        <section id="concierge" class="page px-7">
+            <div class="glass p-10 rounded-[45px] text-center border-[#FFCC00]/10 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#FFCC00]"></div>
+                <i class="fas fa-user-secret text-4xl text-[#FFCC00] mb-8 block"></i>
+                <h2 class="text-2xl font-black mb-4">المهام السرية والخاصة</h2>
+                <p class="text-[12px] text-gray-400 font-bold leading-loose mb-10 px-2">
+                    هل تحتاج شخصاً ينهي مهامك بسرية تامة؟ غرض شخصي؟ أو أمانة مالية؟ فريق النخبة مدرب على التعامل مع أدق التفاصيل بأمان مطلق.
+                </p>
+                <button onclick="handleWhatsApp('سلام JET، عندي مهمة خاصة بغيت نناقشها بخصوصية:')" class="w-full h-16 bg-white text-black rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl">تواصل مع العميل السري</button>
+            </div>
+        </section>
+
+        <!-- SUPPORT -->
+        <section id="support" class="page px-7">
+            <div class="mb-10 text-right">
+                <h2 class="text-3xl font-black mb-2">مركز العناية</h2>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">صوتك مسموع دائماً</p>
+            </div>
+            
+            <div class="glass p-8 rounded-[40px] border-red-500/10 mb-6 text-right">
+                <i class="fas fa-comment-slash text-red-500 text-2xl mb-6 block"></i>
+                <h3 class="text-lg font-black mb-3">هل واجهت مشكلة؟</h3>
+                <p class="text-[11px] text-gray-500 font-bold leading-relaxed mb-8">
+                    نحن نؤمن بالكمال، وإذا حدث أي خطأ، فنحن هنا لتصحيحه فوراً. قدم شكايتك وسيتصل بك المدير مباشرة.
+                </p>
+                <button onclick="handleWhatsApp('شكاية مستعجلة:')" class="w-full h-14 border border-red-500/20 text-red-500 rounded-2xl font-black text-xs uppercase">تقديم شكاية</button>
+            </div>
+
+            <div class="glass p-8 rounded-[40px] border-[#FFCC00]/10 text-right">
+                <i class="fas fa-lightbulb text-[#FFCC00] text-2xl mb-6 block"></i>
+                <h3 class="text-lg font-black mb-3">اقتراح لتطوير JET</h3>
+                <p class="text-[11px] text-gray-500 font-bold leading-relaxed mb-8">
+                    آراؤك هي التي تبني مستقبل هذا النظام. شاركنا أفكارك لتطوير الخدمات فبني ملال.
+                </p>
+                <button onclick="handleWhatsApp('اقتراح لتطوير الخدمة:')" class="w-full h-14 bg-white/5 text-white rounded-2xl font-black text-xs uppercase">إرسال اقتراح</button>
+            </div>
+        </section>
+
+        <!-- ELITE STATION -->
+        <section id="elite" class="page px-7">
+            <div class="mb-10 text-right">
+                <h2 class="text-3xl font-black mb-2">نادي النخبة</h2>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">مستويات العضوية والامتيازات</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Level 1: Silver -->
+                <div class="glass p-6 rounded-[30px] level-card text-right border-white/5">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-gray-400/10 flex items-center justify-center text-gray-400 border border-gray-400/20">
+                            <i class="fas fa-award text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="text-lg font-black text-gray-300">Level 1: الفضي</h3>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">1 - 50 طلب</span>
+                        </div>
                     </div>
-                    <div class="glass-card p-8">
-                        <h3 class="text-[#FFCC00] font-bold mb-4">أرقامنا</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><span class="block text-2xl font-black">+500</span> <span class="text-[10px] text-gray-500 uppercase">طلب ناجح</span></div>
-                            <div><span class="block text-2xl font-black">4.9</span> <span class="text-[10px] text-gray-500 uppercase">تقييم الكليان</span></div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-right">
+                            <i class="fas fa-check-circle text-gray-400 text-xs"></i>
+                            <p class="text-[11px] font-bold text-gray-400">أولوية في الرد (VIP Support)</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-right">
+                            <i class="fas fa-check-circle text-gray-400 text-xs"></i>
+                            <p class="text-[11px] font-bold text-gray-400">شارة (Badge) فضية في الحساب</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+                            <span class="text-[10px] font-black text-gray-500 uppercase">التكلفة</span>
+                            <span class="text-[11px] font-black text-white">0 درهم (تسيير فقط)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Level 2: Gold -->
+                <div class="glass p-6 rounded-[30px] level-card active-level text-right border-[#FFCC00]/10">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-[#FFCC00]/10 flex items-center justify-center text-[#FFCC00] border border-[#FFCC00]/20 shadow-[0_0_15px_rgba(255,204,0,0.1)]">
+                            <i class="fas fa-crown text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="text-lg font-black text-[#FFCC00]">Level 2: الذهبي</h3>
+                            <span class="text-[10px] font-bold text-[#FFCC00]/70 uppercase tracking-widest">150 طلب</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-right">
+                            <i class="fas fa-star text-[#FFCC00] text-xs"></i>
+                            <p class="text-[11px] font-bold text-white">توصيلة واحدة مجانية في الشهر</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-right">
+                            <i class="fas fa-star text-[#FFCC00] text-xs"></i>
+                            <p class="text-[11px] font-bold text-white">أولوية قصوى في خدمات الـ Concierge</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+                            <span class="text-[10px] font-black text-[#FFCC00] uppercase">التكلفة</span>
+                            <span class="text-[11px] font-black text-white font-tech">10 - 15 DH (ليصانص)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Level 3: Elite -->
+                <div class="glass p-6 rounded-[30px] level-card text-right border-purple-500/10">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
+                            <i class="fas fa-gem text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="text-lg font-black text-purple-400">Level 3: النخبة</h3>
+                            <span class="text-[10px] font-bold text-purple-500/70 uppercase tracking-widest">+500 طلب</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-right">
+                            <i class="fas fa-bolt text-purple-400 text-xs"></i>
+                            <p class="text-[11px] font-bold text-gray-300">تعريفة خاصة (Flat Rate)</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-right">
+                            <i class="fas fa-bolt text-purple-400 text-xs"></i>
+                            <p class="text-[11px] font-bold text-gray-300">هدايا رمزية من الشركاء</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-right">
+                            <i class="fas fa-bolt text-purple-400 text-xs"></i>
+                            <p class="text-[11px] font-bold text-gray-300">مساعد شخصي (رقم واتساب خاص)</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+                            <span class="text-[10px] font-black text-purple-400 uppercase">التكلفة</span>
+                            <span class="text-[11px] font-black text-white">0 درهم (اتفاقيات)</span>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- PLACEHOLDERS -->
-        <section id="market" class="page-content px-6 text-center"><h2 class="text-3xl font-tech uppercase">Marketplace</h2></section>
-        <section id="wallet" class="page-content px-6 text-center"><h2 class="text-3xl font-tech uppercase">Digital Wallet</h2></section>
-
     </main>
 
-    <!-- SERVICE MODAL -->
-    <div id="service-modal" onclick="closeModal(event)">
-        <div class="glass-card max-w-lg w-full p-8 border-2 border-[#FFCC00]/30 relative animate-in fade-in zoom-in duration-300" onclick="event.stopPropagation()">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
-            <div id="modal-content"></div>
-        </div>
-    </div>
+    <script>
+        // 3D Background Script
+        let scene, camera, renderer, particles;
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
 
-        // LOCAL VSCODE FIX: Check if Firebase config exists. If not, bypass to allow UI to work.
-        let auth = null;
-        try {
-            if (typeof __firebase_config !== 'undefined') {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-            } else {
-                console.warn("Firebase config not found. Running in UI-only mode for VS Code.");
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            for (let i = 0; i < 5000; i++) {
+                vertices.push(THREE.MathUtils.randFloatSpread(2000), THREE.MathUtils.randFloatSpread(2000), THREE.MathUtils.randFloatSpread(2000));
             }
-        } catch (e) {
-            console.error("Firebase Initialization Error:", e);
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+            const material = new THREE.PointsMaterial({ color: 0xFFCC00, size: 2, transparent: true, opacity: 0.5 });
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            camera.position.z = 1000;
+            animate3D();
         }
 
-        // --- EXTENDED DATA (12 SERVICES) ---
-        const servicesData = [
-            // JET-الدار
-            { id: 1, category: "home_serv", title_ar: "خدمة-المؤونة", title_en: "Groceries", title_fr: "Courses", desc_ar: "نتقداو ليك أحسن ما كاين فالسويقة واللحم بجودة عالية.", price: "20 DH", eta: "30-45 min", icon: "fa-shopping-basket", featured: true },
-            { id: 2, category: "home_serv", title_ar: "مصبنة-إكسبريس", title_en: "Laundry", title_fr: "Pressing", desc_ar: "نجيو ناخدو الحوايج، نغسلوهم ونصلحوهم ونرجعوهم ليك فنهارهم.", price: "Sur devis", eta: "6-12h", icon: "fa-tshirt" },
-            { id: 3, category: "home_serv", title_ar: "توصيل-البوطة", title_en: "Gas Delivery", title_fr: "Livraison Gaz", desc_ar: "تقادات ليك البوطة؟ حنا نجيبوها ليك حتى لباب الدار.", price: "10 DH", eta: "15-20 min", icon: "fa-fire-alt" },
-            
-            // JET-برو
-            { id: 4, category: "pro", title_ar: "خدمة-الفحص", title_en: "Inspection", title_fr: "Contrôle", desc_ar: "نفحصو ليك أي سلعة قبل ما تشريها من أنترنت ونعطيوك تقرير.", price: "50 DH", eta: "Flexible", icon: "fa-check-double", featured: true },
-            { id: 5, category: "pro", title_ar: "الأمانة-برو", title_en: "Trust Courier", title_fr: "Courrier Confiance", desc_ar: "توصيل الوثائق والأغراض الثمينة بين المدن بضمانة JET.", price: "Sur devis", eta: "24h", icon: "fa-shield-alt" },
-            { id: 6, category: "pro", title_ar: "فحص-العقار", title_en: "Real Estate Check", title_fr: "Visite Immo", desc_ar: "بناء على طلبك، كنمشيو نشوفو الدار ولا المحل ونصورو ليك فيديو.", price: "100 DH", eta: "Same Day", icon: "fa-home" },
-            
-            // JET-إغاثة
-            { id: 7, category: "sos", title_ar: "خدمة-الدواء", title_en: "Pharmacy SOS", title_fr: "Pharmacie SOS", desc_ar: "توصيل الدواء من صيدلية الحراسة فأنصاف الليالي.", price: "30 DH", eta: "15-30 min", icon: "fa-pills", featured: true },
-            { id: 8, category: "sos", title_ar: "ديباناج-ميكانيك", title_en: "Roadside Assist", title_fr: "Dépannage", desc_ar: "طحتي أون بان؟ ميكانيكي JET يوصل عندك فين ما كنتي.", price: "Sur devis", eta: "20-40 min", icon: "fa-car-crash" },
-            { id: 9, category: "sos", title_ar: "فتح-السوارت", title_en: "Locksmith", title_fr: "Serrurier", desc_ar: "نسيتي السوارت لداخل؟ خبير السوارت ديالنا يحل ليك المشكل.", price: "Sur devis", eta: "15-25 min", icon: "fa-key" },
-
-            // JET-تقني
-            { id: 10, category: "tech", title_ar: "خدمة-مصلح", title_en: "Repair Pro", title_fr: "Réparateur", desc_ar: "إصلاح الهواتف والحواسيب مع خدمة الأخذ والإرجاع.", price: "Sur devis", eta: "24-48h", icon: "fa-tools", featured: true },
-            { id: 11, category: "tech", title_ar: "دعم-الويفي", title_en: "Wifi Support", title_fr: "Support Wifi", desc_ar: "مشاكل فالأنترنت؟ خبير تقني يجي يقاد ليك الريزو فالدار.", price: "50 DH", eta: "1-2h", icon: "fa-wifi" },
-            { id: 12, category: "tech", title_ar: "تركيب-التجهيزات", title_en: "Installation", title_fr: "Installation", desc_ar: "تركيب التلفاز، الثلاجة أو أي أجهزة منزلية جديدة.", price: "Sur devis", eta: "Flexible", icon: "fa-plug" },
-        ];
-
-        const translations = {
-            ar: {
-                nav_home: "الرئيسية", nav_market: "الماركت", nav_services: "الخدمات", nav_about: "من نحن", nav_wallet: "المحفظة",
-                search_placeholder: "قلب على: بوطة، دواء، مصلح...",
-                home_desc: "نظام التشغيل الذكي لمدينة بني ملال. كل احتياجاتك في منصة واحدة.",
-                btn_discover: "اكتشف الخدمات", filter_all: "الكل",
-                cat_home: "JET-الدار", cat_pro: "JET-برو", cat_sos: "JET-إغاثة", cat_tech: "JET-تقني",
-                order_now: "اطلب الآن عبر WhatsApp", price_label: "الثمن:", eta_label: "الوقت:",
-                no_results_title: "مالقيناش هاد الخدمة", no_results_desc: "ولكن نقدروا نوجدوها ليك! تواصل معانا.",
-                about_title: "حول JET OS", coming_soon: "قريباً..."
-            },
-            en: {
-                nav_home: "HOME", nav_market: "MARKET", nav_services: "SERVICES", nav_about: "ABOUT", nav_wallet: "WALLET",
-                search_placeholder: "Search: gas, medicine, repair...",
-                home_desc: "Smart OS for Beni-Mellal. Everything you need in one app.",
-                btn_discover: "Discover", filter_all: "All",
-                cat_home: "JET-Home", cat_pro: "JET-Pro", cat_sos: "JET-SOS", cat_tech: "JET-Tech",
-                order_now: "Order via WhatsApp", price_label: "Price:", eta_label: "ETA:",
-                no_results_title: "No Results Found", no_results_desc: "But we can make it happen! Contact us.",
-                about_title: "About JET OS", coming_soon: "Coming soon..."
-            },
-            fr: {
-                nav_home: "ACCUEIL", nav_market: "MARCHÉ", nav_services: "SERVICES", nav_about: "À PROPOS", nav_wallet: "WALLET",
-                search_placeholder: "Chercher: gaz, médicaments...",
-                home_desc: "L'OS intelligent pour Beni-Mellal. Tout sur une seule plateforme.",
-                btn_discover: "Découvrir", filter_all: "Tous",
-                cat_home: "JET-Maison", cat_pro: "JET-Pro", cat_sos: "JET-SOS", cat_tech: "JET-Tech",
-                order_now: "Commander via WhatsApp", price_label: "Prix:", eta_label: "Temps:",
-                no_results_title: "Aucun Résultat", no_results_desc: "On peut quand même vous aider! Contactez-nous.",
-                about_title: "À Propos", coming_soon: "Bientôt..."
-            }
-        };
-
-        let currentLang = 'ar';
-        let currentFilter = 'all';
-
-        // --- ENHANCED CORE FUNCTIONS ---
-
-        window.renderServices = (dataToRender = servicesData) => {
-            const grid = document.getElementById('services-grid');
-            const noResults = document.getElementById('no-results');
-            if(!grid) return;
-            
-            grid.innerHTML = '';
-            
-            if (dataToRender.length === 0) {
-                noResults.classList.remove('hidden');
-                return;
-            } else {
-                noResults.classList.add('hidden');
-            }
-            
-            dataToRender.forEach(s => {
-                const title = s[`title_${currentLang}`];
-                const card = document.createElement('div');
-                card.className = "glass-card p-5 cursor-pointer flex flex-col items-center text-center relative overflow-hidden group";
-                if (s.featured) card.innerHTML += `<div class="absolute top-0 right-0 bg-[#FFCC00] text-black text-[8px] font-black px-3 py-1 rounded-bl-lg uppercase tracking-tighter">Best</div>`;
-                
-                card.onclick = () => openModal(s);
-                card.innerHTML += `
-                    <div class="w-14 h-14 bg-[#FFCC00]/5 rounded-2xl flex items-center justify-center mb-4 border border-[#FFCC00]/10 group-hover:bg-[#FFCC00]/20 transition-all">
-                        <i class="fas ${s.icon} text-[#FFCC00] text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-sm mb-2 group-hover:text-[#FFCC00] transition-colors">${title}</h3>
-                    <div class="flex items-center gap-1 text-[10px] text-gray-500">
-                        <i class="fas fa-star text-[#FFCC00] scale-75"></i> 4.9 • ${s.price}
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        };
-
-        window.handleSearch = (val) => {
-            const query = val.toLowerCase();
-            const filtered = servicesData.filter(s => {
-                const matchTitle = (s[`title_${currentLang}`] || "").toLowerCase().includes(query);
-                const matchCat = (s.category || "").toLowerCase().includes(query);
-                return matchTitle || matchCat;
-            });
-            renderServices(filtered);
-        };
-
-        window.filterServices = (cat) => {
-            currentFilter = cat;
-            document.querySelectorAll('.filter-chip').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('onclick').includes(cat));
-            });
-            
-            const grid = document.getElementById('services-grid');
-            if(grid) grid.style.opacity = '0.3';
-            setTimeout(() => {
-                const filtered = cat === 'all' ? servicesData : servicesData.filter(s => s.category === cat);
-                renderServices(filtered);
-                if(grid) grid.style.opacity = '1';
-            }, 200);
-        };
-
-        window.openModal = (service) => {
-            const modal = document.getElementById('service-modal');
-            const content = document.getElementById('modal-content');
-            const title = service[`title_${currentLang}`];
-            const desc = service[`desc_${currentLang}`];
-            const whatsappMsg = encodeURIComponent(`السلام عليكم JET، بغيت نطلب خدمة: ${title}. هاهو اللوكاسيون ديالي: [Location]`);
-            
-            content.innerHTML = `
-                <div class="flex items-center gap-4 mb-6" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
-                    <div class="w-20 h-20 bg-[#FFCC00] rounded-3xl flex items-center justify-center text-black shadow-2xl shadow-[#FFCC00]/20">
-                        <i class="fas ${service.icon} text-3xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-3xl font-black font-tech text-[#FFCC00] leading-tight">${title}</h2>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="bg-white/10 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest text-gray-300">Verified Service</span>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-gray-400 text-sm leading-relaxed mb-8 text-right" dir="rtl">${desc}</p>
-                <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
-                        <span class="block text-[10px] text-gray-500 uppercase mb-1">${translations[currentLang].price_label}</span>
-                        <span class="font-black text-xl text-[#FFCC00]">${service.price}</span>
-                    </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
-                        <span class="block text-[10px] text-gray-500 uppercase mb-1">${translations[currentLang].eta_label}</span>
-                        <span class="font-black text-xl text-white">${service.eta}</span>
-                    </div>
-                </div>
-                <a href="https://wa.me/212600000000?text=${whatsappMsg}" target="_blank" class="w-full bg-[#FFCC00] text-black py-5 rounded-2xl font-black text-center block text-sm shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3">
-                    <i class="fab fa-whatsapp text-xl"></i> ${translations[currentLang].order_now}
-                </a>
-            `;
-            modal.style.display = 'flex';
-        };
-
-        window.closeModal = () => document.getElementById('service-modal').style.display = 'none';
-
-        window.cycleLang = () => {
-            const langs = ['ar', 'en', 'fr'];
-            currentLang = langs[(langs.indexOf(currentLang) + 1) % langs.length];
-            updateUILanguage();
-            renderServices();
-        };
-
-        function updateUILanguage() {
-            const langBtn = document.getElementById('lang-btn');
-            if(langBtn) langBtn.innerText = currentLang.toUpperCase();
-            document.documentElement.lang = currentLang;
-            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.querySelectorAll('[data-t]').forEach(el => {
-                const key = el.getAttribute('data-t');
-                if (translations[currentLang][key]) {
-                    el.tagName === 'INPUT' ? el.placeholder = translations[currentLang][key] : el.innerText = translations[currentLang][key];
-                }
-            });
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            particles.rotation.y += 0.001;
+            particles.rotation.x += 0.0005;
+            renderer.render(scene, camera);
         }
 
-        window.showPage = (id) => {
-            document.querySelectorAll('.page-content').forEach(p => {
-                p.classList.remove('active');
-                setTimeout(() => p.style.display = 'none', 300);
-            });
-            setTimeout(() => {
-                const target = document.getElementById(id);
-                if(target) {
-                    target.style.display = 'block';
-                    setTimeout(() => target.classList.add('active'), 50);
-                }
-            }, 300);
-            document.querySelectorAll('[data-nav]').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.nav === id);
-            });
-        };
-
-        window.toggleTheme = () => {
-            document.body.classList.toggle('light-mode');
-            const icon = document.getElementById('theme-icon');
-            if(icon) icon.className = document.body.classList.contains('light-mode') ? 'fas fa-sun' : 'fas fa-moon';
-        };
-
-        // Standard initialization
-        window.addEventListener('load', async () => {
-            updateUILanguage();
-            renderServices();
-            if (auth) {
-                try {
-                    await signInAnonymously(auth);
-                    console.log("Authenticated with Firebase");
-                } catch (e) {
-                    console.error("Auth Error:", e);
-                }
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
             }
         });
+
+        // App Logic
+        const JET_PHONE = "+212600000000"; 
+        const DEFAULT_MSG = "سلام JET، أنا كمال، محتاج خدمة...";
+
+        function handleCall() {
+            vibrate();
+            window.location.href = `tel:${JET_PHONE}`;
+        }
+
+        function handleWhatsApp(customMsg) {
+            vibrate();
+            const msg = customMsg || DEFAULT_MSG;
+            window.location.href = `https://wa.me/${JET_PHONE.replace('+', '')}?text=${encodeURIComponent(msg)}`;
+        }
+
+        function showPage(pageId) {
+            vibrate();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(pageId);
+            if (target) {
+                target.classList.add('active');
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.toggle('active', item.dataset.page === pageId);
+                });
+            }
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function vibrate() {
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(10);
+            }
+        }
+
+        window.onload = () => {
+            init3D();
+            showPage('home');
+        };
     </script>
 </body>
 </html>
